@@ -2,14 +2,16 @@ package pl.mjasinskee.ocppstation
 
 import java.net.URI
 
-import akka.actor.Props
+import akka.actor.{Actor, ActorLogging, Props}
 import com.thenewmotion.ocpp.json.api.client.OcppJsonClient
 import com.thenewmotion.ocpp.{Version, Version1X}
+import pl.mjasinskee.ocppstation.UserActor.EVConnected
 
 import scala.concurrent.ExecutionContext
 import ExecutionContext.Implicits.global
 
 object StationApp {
+
   def main(args: Array[String]) {
     val chargerId = args.headOption.getOrElse("NUON_0001")
     val centralSystemUri =
@@ -26,11 +28,30 @@ object StationApp {
       new DefaultChargingPoint
     }
 
-    system.actorOf(Props(new ChargerActor(ocppJsonClient)))
-
     ocppJsonClient.onClose.foreach(_ => println("OCPP connection closed"))
 
     println(s"Connected using OCPP version ${ocppJsonClient.ocppVersion}")
+
+    system.actorOf(Props(new ChargerActor(ocppJsonClient)), name = "chargingStation")
+    system.actorOf(Props(new UserActor()), name = "user") ! EVConnected
   }
+
+}
+
+class UserActor extends Actor with ActorLogging {
+import UserActor._
+
+  override def receive: Receive = {
+    case EVConnected => log.info("EV connected")
+    case EVDisconnected => log.info("EV disconnected")
+  }
+
+}
+
+object UserActor {
+
+  sealed trait UserAction
+  case object EVConnected extends UserAction
+  case object EVDisconnected extends UserAction
 
 }

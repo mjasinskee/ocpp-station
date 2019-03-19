@@ -1,14 +1,23 @@
 package pl.mjasinskee.ocppstation
 
+import akka.actor.{Actor, ActorLogging, Props}
 import com.thenewmotion.ocpp.messages.v1x.{CancelReservationReq, CancelReservationRes, ChangeAvailabilityReq, ChangeAvailabilityRes, ChangeConfigurationReq, ChangeConfigurationRes, ChargePoint, ChargePointDataTransferReq, ChargePointDataTransferRes, ClearCacheRes, ClearChargingProfileReq, ClearChargingProfileRes, GetCompositeScheduleReq, GetCompositeScheduleRes, GetConfigurationReq, GetConfigurationRes, GetDiagnosticsReq, GetDiagnosticsRes, GetLocalListVersionRes, RemoteStartTransactionReq, RemoteStartTransactionRes, RemoteStopTransactionReq, RemoteStopTransactionRes, ReserveNowReq, ReserveNowRes, ResetReq, ResetRes, SendLocalListReq, SendLocalListRes, SetChargingProfileReq, SetChargingProfileRes, TriggerMessageReq, TriggerMessageRes, UnlockConnectorReq, UnlockConnectorRes, UpdateFirmwareReq}
 
 import scala.concurrent.Future
 
 class DefaultChargingPoint extends ChargePoint {
+  import CentralSystemActor._
+  val actor = system.actorOf(Props(new CentralSystemActor()))
 
-  override def remoteStartTransaction(req: RemoteStartTransactionReq): Future[RemoteStartTransactionRes] = Future.successful(RemoteStartTransactionRes(accepted = true))
+  override def remoteStartTransaction(req: RemoteStartTransactionReq): Future[RemoteStartTransactionRes] = {
+    actor ! RemoteStopRequested
+    Future.successful(RemoteStartTransactionRes(accepted = true))
+  }
 
-  override def remoteStopTransaction(req: RemoteStopTransactionReq): Future[RemoteStopTransactionRes] = ???
+  override def remoteStopTransaction(req: RemoteStopTransactionReq): Future[RemoteStopTransactionRes] = {
+    actor ! RemoteStopRequested
+    Future.successful(RemoteStopTransactionRes(accepted = true))
+  }
 
   override def unlockConnector(req: UnlockConnectorReq): Future[UnlockConnectorRes] = ???
 
@@ -43,4 +52,27 @@ class DefaultChargingPoint extends ChargePoint {
   override def setChargingProfile(req: SetChargingProfileReq): Future[SetChargingProfileRes] = ???
 
   override def triggerMessage(req: TriggerMessageReq): Future[TriggerMessageRes] = ???
+}
+
+class CentralSystemActor extends Actor with ActorLogging{
+
+  import CentralSystemActor._
+
+  override def preStart() {
+    log.info("CentralSystem Actor initialized")
+  }
+
+  override def receive: Receive = {
+    case RemoteStartRequested => log.info("CentralSystem Actor handling RemoteStartRequested")
+    case RemoteStopRequested => log.info("CentralSystem Actor handling RemoteStopRequested")
+  }
+
+}
+
+object CentralSystemActor {
+
+  sealed trait Action
+  case class RemoteStartRequested() extends Action
+  case class RemoteStopRequested() extends Action
+
 }
