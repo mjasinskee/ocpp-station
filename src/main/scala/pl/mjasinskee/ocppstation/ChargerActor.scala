@@ -16,9 +16,6 @@ import scala.language.postfixOps
 
 class ChargerActor(client: Ocpp1XJsonClient) extends Actor with ActorLogging {
   import ChargerActor._
-  def actor = system.actorOf(Props(new ConnectorActor(client)), name = "connector_01")
-
-
 
   override def preStart() {
 
@@ -48,6 +45,7 @@ class ChargerActor(client: Ocpp1XJsonClient) extends Actor with ActorLogging {
 
   }
 
+
   override def receive = {
     case RemoteStartRequested => log.info("RemoteStart requested")
     case RemoteStopRequested => log.info("RemoteStop received")
@@ -56,7 +54,6 @@ class ChargerActor(client: Ocpp1XJsonClient) extends Actor with ActorLogging {
       client.send(HeartbeatReq).map(res => log.info(res.toString))
     }
   }
-
 }
 
 object ChargerActor {

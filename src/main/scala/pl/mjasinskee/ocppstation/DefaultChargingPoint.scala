@@ -1,5 +1,6 @@
 package pl.mjasinskee.ocppstation
 
+
 import akka.actor.{Actor, ActorLogging, Props}
 import com.thenewmotion.ocpp.messages.v1x.{CancelReservationReq, CancelReservationRes, ChangeAvailabilityReq, ChangeAvailabilityRes, ChangeConfigurationReq, ChangeConfigurationRes, ChargePoint, ChargePointDataTransferReq, ChargePointDataTransferRes, ClearCacheRes, ClearChargingProfileReq, ClearChargingProfileRes, GetCompositeScheduleReq, GetCompositeScheduleRes, GetConfigurationReq, GetConfigurationRes, GetDiagnosticsReq, GetDiagnosticsRes, GetLocalListVersionRes, RemoteStartTransactionReq, RemoteStartTransactionRes, RemoteStopTransactionReq, RemoteStopTransactionRes, ReserveNowReq, ReserveNowRes, ResetReq, ResetRes, SendLocalListReq, SendLocalListRes, SetChargingProfileReq, SetChargingProfileRes, TriggerMessageReq, TriggerMessageRes, UnlockConnectorReq, UnlockConnectorRes, UpdateFirmwareReq}
 

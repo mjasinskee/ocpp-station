@@ -33,6 +33,7 @@ object StationApp {
     println(s"Connected using OCPP version ${ocppJsonClient.ocppVersion}")
 
     system.actorOf(Props(new ChargerActor(ocppJsonClient)), name = "chargingStation")
+    system.actorOf(Props(new ConnectorActor(ocppJsonClient)), name = "connector_01")
     system.actorOf(Props(new UserActor()), name = "user") ! EVConnected
   }
 
